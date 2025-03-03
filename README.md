@@ -18,3 +18,17 @@ The fuzzer should:
 
 - If an invariant fails, the fuzzer should log the failing invariant and the sequence of function calls, along with the inputs that caused the invariant to fail.
   - Add a `max_steps` parameter to limit the number of function calls before stopping the fuzzer if no invariant fails.
+
+## Usage
+
+Run the fuzzer with the following command:
+
+```bash
+cargo run -- <target_contract_path> <target_contract_name>
+```
+
+For example:
+
+```bash
+cargo run -- contracts/SimpleInvariantCheck.sol SimpleInvariantCheck
+```

@@ -21,4 +21,8 @@ contract SimpleInvariantCheck {
     function invariant_unsolvable() public view returns (bool) {
         return !ctf.won();
     }
+
+    function solveWrapper(uint256 value, bool flag) public {
+        ctf.solve(value, flag);
+    }
 }

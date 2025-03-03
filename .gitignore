@@ -1,1 +1,5 @@
+# cargo output
 /target
+
+# forge output
+/artifacts
