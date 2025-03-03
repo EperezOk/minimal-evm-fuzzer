@@ -20,6 +20,11 @@ The fuzzer should:
 
 - [X] Add a `max_steps` parameter to limit the number of function calls before stopping the fuzzer if no invariant fails.
 
+## Prerequisites
+
+- [Rust](https://www.rust-lang.org/tools/install)
+- [Foundry](https://book.getfoundry.sh/getting-started/installation) (for compiling and deploying contracts on a local network)
+
 ## Usage
 
 Run the fuzzer with the following command:
@@ -31,5 +36,7 @@ cargo run -- <target_contract_path> <target_contract_name> [max_steps]
 For example:
 
 ```bash
-cargo run -- contracts/SimpleInvariantCheck.sol SimpleInvariantCheck 50
+cargo run -- examples/SimpleInvariantCheck.sol SimpleInvariantCheck 50
 ```
+
+> You can find an example contract to fuzz in the [`examples`](./examples/) directory.
