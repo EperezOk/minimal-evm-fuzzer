@@ -1,16 +1,13 @@
+mod compiler;
+mod contract;
+
 use alloy::{
-    contract::{ContractInstance, Interface},
     dyn_abi::DynSolValue,
     json_abi::StateMutability,
-    network::TransactionBuilder,
-    primitives::{hex, Address, I256, U160, U256},
-    providers::{Provider, ProviderBuilder},
-    rpc::types::TransactionRequest,
+    primitives::{Address, I256, U160, U256},
 };
 use eyre::Result;
 use rand::{Rng, RngCore};
-use std::path::PathBuf;
-use std::process::Command;
 
 #[tokio::main]
 async fn main() -> Result<()> {
@@ -31,53 +28,11 @@ async fn main() -> Result<()> {
         .parse::<usize>()
         .expect("Max steps argument must be a positive integer");
 
-    let file_name = PathBuf::from(contract_path)
-        .file_name()
-        .unwrap()
-        .to_str()
-        .unwrap()
-        .to_string();
+    // Compile target contract
+    let (abi, bytecode) = compiler::compile_contract(contract_path, contract_name)?;
 
-    // Compile the contract using Forge
-    Command::new("forge")
-        .args(&[
-            "build",
-            contract_path,
-            "--out",
-            "artifacts",
-            "--cache-path",
-            "artifacts",
-        ])
-        .status()?;
-
-    let out_path =
-        std::env::current_dir()?.join(format!("artifacts/{}/{}.json", file_name, contract_name));
-
-    // Read the artifact which contains the `abi` and `bytecode` of the target contract
-    let artifact = std::fs::read(out_path).expect("Failed to read compilation artifact");
-    let json: serde_json::Value = serde_json::from_slice(&artifact)?;
-
-    let abi = json.get("abi").expect("Failed to get ABI from artifact");
-    let abi = serde_json::from_str(&abi.to_string())?;
-
-    let bytecode = json
-        .get("bytecode")
-        .expect("Failed to get creation code from artifact");
-    let bytecode = bytecode.get("object").unwrap();
-    let bytecode = hex::decode(bytecode.as_str().unwrap().trim_start_matches("0x"))?;
-
-    // Spin up a local Anvil node and deploy the contract
-    let provider = ProviderBuilder::new().on_anvil_with_wallet();
-
-    let tx = TransactionRequest::default().with_deploy_code(bytecode);
-    let contract_address = provider
-        .send_transaction(tx)
-        .await?
-        .get_receipt()
-        .await?
-        .contract_address
-        .expect("Failed to deploy target contract");
-    let contract = ContractInstance::new(contract_address, provider.clone(), Interface::new(abi));
+    // Deploy target contract
+    let contract = contract::deploy_contract(abi, bytecode).await?;
 
     // Collect all properties and fuzz targets from the contract
     let properties: Vec<_> = contract
