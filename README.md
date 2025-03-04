@@ -1,10 +1,11 @@
-# Rust EVM Fuzzer
+# REF (Rust EVM Fuzzer)
 
-## Idea
+REF is a minimalistic property-based fuzzer for EVM programs (ie. smart contracts).
 
-Implement a minimalistic property-based fuzzer for EVM programs (ie. smart contracts).
+It is written in Rust and uses the [`alloy`](https://github.com/alloy-rs/alloy) crate to interact with a local node ([`anvil`](https://github.com/foundry-rs/foundry?tab=readme-ov-file#anvil)), which is used to deploy and call the target contracts. Additionally, [`forge`](https://github.com/foundry-rs/foundry?tab=readme-ov-file#forge) is used to compile the contracts before deploying them.
 
-The fuzzer should:
+## Features
+
 - [X] Take a target contract as input.
 
 - [X] Deploy the contract on a local network.
@@ -23,7 +24,7 @@ The fuzzer should:
 ## Prerequisites
 
 - [Rust](https://www.rust-lang.org/tools/install)
-- [Foundry](https://book.getfoundry.sh/getting-started/installation) (for compiling and deploying contracts on a local network)
+- [Foundry](https://book.getfoundry.sh/getting-started/installation)
 
 ## Usage
 
