@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use std::process::Command;
 
 /// Compiles a Solidity contract using Forge and returns its ABI and bytecode
-pub fn compile_contract(contract_path: &str, contract_name: &str) -> Result<(JsonAbi, Vec<u8>)> {
+pub fn compile(contract_path: &str, contract_name: &str) -> Result<(JsonAbi, Vec<u8>)> {
     let file_name = PathBuf::from(contract_path)
         .file_name()
         .ok_or_else(|| eyre!("Invalid contract path"))?
@@ -32,10 +32,12 @@ pub fn compile_contract(contract_path: &str, contract_name: &str) -> Result<(Jso
         std::env::current_dir()?.join(format!("artifacts/{}/{}.json", file_name, contract_name));
 
     // Read the artifact which contains the `abi` and `bytecode` of the target contract
-    let artifact = std::fs::read(&out_path).expect("Failed to read compilation artifact");
+    let artifact = std::fs::read(&out_path).map_err(|e| eyre!("Failed to read artifact: {}", e))?;
     let json: serde_json::Value = serde_json::from_slice(&artifact)?;
 
-    let abi = json.get("abi").expect("Failed to get ABI from artifact");
+    let abi = json
+        .get("abi")
+        .ok_or_else(|| eyre!("Failed to get ABI from artifact"))?;
     let abi = serde_json::from_str(&abi.to_string())?;
 
     let bytecode = json
