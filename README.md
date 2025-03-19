@@ -15,7 +15,7 @@ It is written in Rust and uses the [`alloy`](https://github.com/alloy-rs/alloy) 
    - Functions beginning with `invariant_` to check invariants. These should return a boolean to indicate if the invariant holds (true) or not (false).
    - Non-view functions to fuzz.
 
-- [X] Call the functions to fuzz with random inputs, and check the invariants after each call.
+- [X] Randomly call the functions to fuzz with random inputs, and check the invariants after each call.
 
 - [X] If an invariant fails, the fuzzer should log the failing invariant and the sequence of function calls, along with the inputs that caused the invariant to fail.
 
@@ -41,3 +41,17 @@ cargo run -- examples/SimpleInvariantCheck.sol SimpleInvariantCheck 50
 ```
 
 > You can find an example contract to fuzz in the [`examples`](./examples/) directory.
+
+Example output:
+
+```
+Fuzzing contract SimpleInvariantCheck (max steps = 50)
+
+Call: solveWrapper([Uint(43970993566387452639593763277240575612, 256)])
+Call: setFlagWrapper([Bool(true)])
+Call: setFlagWrapper([Bool(false)])
+Call: setFlagWrapper([Bool(true)])
+Call: solveWrapper([Uint(22171698411337210811977953420121770230, 256)])
+
+invariant_unsolvable broken 💥
+```
